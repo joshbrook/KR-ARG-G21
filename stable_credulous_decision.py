@@ -1,6 +1,7 @@
 import json
 import sys
 import random
+import time
 import networkx as nx
 import matplotlib.pyplot as plt
 from itertools import chain, combinations
@@ -83,13 +84,25 @@ def main():
             print("Arguments: " + str(list(arguments)))
             print("Attacks: " + str([a + " -> " + b for a, b in attacks]))
     
+
+    start = time.perf_counter()
+
     stablesets = find_stable_sets(attacks, arguments)
+
+    end1 = time.perf_counter()
+    print(f"All stable sets found in {(end1 - start)*1000} milliseconds")
+
 
     for stableset in stablesets:
         if argument in stableset:
-            print('YOU SHALL PASS')
+            end = time.perf_counter()
+            print('+ Positive, the argument is in at least one stable set.')
+            print(f"Elapsed time: {(end - start)*1000} milliseconds")
             return
-    print('YOU SHALL NOT PASS')
+    end = time.perf_counter()
+    print('- Negative, the argument is not in any stable set.')
+    
+    print(f"... Elapsed time: {(end - start)*1000} milliseconds")
 
         
 if __name__ == "__main__":
