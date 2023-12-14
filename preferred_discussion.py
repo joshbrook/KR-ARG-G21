@@ -31,14 +31,15 @@ def show_graph(attacks, arguments):
 def check_argument(arguments, attacks, opp, props, opps):
     """Check if the argument is acceptable."""
 
-    opp in arguments or sys.exit("Argument not found in the argumentation framework.")
+    opp in arguments or sys.exit("Argument not found in the argumentation framework.\n")
     for arg in props:
         if [opp, arg] in attacks:
-            opp in opps and sys.exit("Your chosen argument has already been used.")
+            if opp in opps:
+                sys.exit("Your chosen argument has already been used.")
             opps.append(opp)
             return opps
 
-    sys.exit("Your chosen argument does not attack any of the proponent's previous arguments.")    
+    sys.exit("Your chosen argument does not attack any of the proponent's previous arguments.\n")    
 
 
 def respond(opp, opps, arguments, attacks, props):
@@ -46,18 +47,19 @@ def respond(opp, opps, arguments, attacks, props):
 
     random.shuffle(arguments)
     for arg in arguments:
+
         if [arg, opp] in attacks and arg not in opps:
             print("The proponent attacks your argument with: " + arg)
             props.append(arg)
             return props
         
-    sys.exit("The proponent cannot attack your argument.\nYou win!")
+    sys.exit("The proponent cannot attack your argument.\nYou win!\n")
 
 
 def main():
     args = sys.argv[1:]
     if len(args) != 2:
-        print('Usage: python main.py <infile> <argument>')
+        print('Usage: python preferred_discussion.py <infile> <argument>\n')
         sys.exit(1)
     else:
         infile = args[0]
@@ -69,18 +71,23 @@ def main():
             arguments = list(data['Arguments'].keys())
             attacks = data['Attack Relations']
 
-            argument in arguments or sys.exit("Argument not found in the argumentation framework.")
+            if argument not in arguments:
+                sys.exit("Argument not found in the argumentation framework.\n")
 
-            show_graph(attacks, arguments)
+            # show_graph(attacks, arguments)
 
+            print()
+            print("The Argumentation Framework")
             print("Arguments: " + str(list(arguments)))
             print("Attacks: " + str([a + " -> " + b for a, b in attacks]))
+            print()
             print("Round 1")
             print("Proponent's Chosen Argument: " + argument)
 
             props = [argument]
             opps = []
             play = True
+            i = 1
 
             while play:
                 opp = input("Choose an attacking argument: ")
@@ -88,8 +95,17 @@ def main():
                 
                 print("Proponent's Used Arguments:", props)
                 print("Arguments You've Used:", opps)
+                print()
+
+                if opp in props:
+                    sys.exit("You show that the proponent's argument contradicts itself.\nYou win!\n")
+
+                print("Round " + str(i + 1))
 
                 props = respond(opp, opps, arguments, attacks, props)
+
+                i += 1
+
 
 
 # sys.argv[1:] = ["input/ex0.json", "1"]
